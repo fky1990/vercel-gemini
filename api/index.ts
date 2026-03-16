@@ -7,32 +7,29 @@ const app = express();
 // Enable CORS for all origins
 app.use(cors());
 
-// Proxy requests to the Gemini API
-const geminiProxy = createProxyMiddleware({
+// Proxy requests from OpenAI format (/v1/*) to Gemini's OpenAI compatible endpoint
+const openaiToGeminiProxy = createProxyMiddleware({
   target: 'https://generativelanguage.googleapis.com',
   changeOrigin: true,
   pathRewrite: {
-    // Keep the path as is, e.g., /v1beta/models/...
+    '^/v1/': '/v1beta/openai/',
   },
   on: {
     proxyReq: (proxyReq, req, res) => {
-      // If the user hasn't provided an API key in the request, inject the server's key
-      const hasApiKey = req.url.includes('key=') || req.headers['x-goog-api-key'];
-      
-      if (!hasApiKey && process.env.GEMINI_API_KEY) {
-        proxyReq.setHeader('x-goog-api-key', process.env.GEMINI_API_KEY);
-      }
+      // The user sends their Gemini API key via the standard OpenAI Authorization header:
+      // Authorization: Bearer <GEMINI_API_KEY>
+      // Gemini's OpenAI compatibility layer natively accepts this header,
+      // so we just pass it through without needing any Vercel environment variables.
     },
   },
 });
 
-// Route /v1beta and /v1alpha to the proxy
-app.use('/v1beta', geminiProxy);
-app.use('/v1alpha', geminiProxy);
+// Route /v1 to the proxy
+app.use('/v1', openaiToGeminiProxy);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', message: 'Gemini Proxy is running on Vercel!' });
+  res.json({ status: 'ok', message: 'OpenAI to Gemini Proxy is running on Vercel!' });
 });
 
 // Export the Express API
