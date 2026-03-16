@@ -1,0 +1,5 @@
+{
+  "name": "Gemini Vercel Proxy",
+  "description": "A Vercel-ready proxy server for the Gemini API, allowing local clients to make requests without exposing API keys.",
+  "requestFramePermissions": []
+}

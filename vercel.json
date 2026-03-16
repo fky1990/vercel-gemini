@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "rewrites": [
+    {
+      "source": "/v1beta/:match*",
+      "destination": "/api/index"
+    },
+    {
+      "source": "/v1alpha/:match*",
+      "destination": "/api/index"
+    }
+  ]
+}
