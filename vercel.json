@@ -2,8 +2,8 @@
   "version": 2,
   "rewrites": [
     {
-      "source": "/v1/:match*",
-      "destination": "/api/index"
+      "source": "/v1/:path*",
+      "destination": "/api/index?path=:path*"
     }
   ]
 }
